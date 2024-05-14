@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Jogo: pedra, papel, tesoura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap " rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="game" id="game">
+        <div class="row bg-dark text-light mx-3 p-1" style="height: 46vh;">
+            <div class="col d-flex flex-column text-center justify-content-center align-items-center m-2">
+                <h5 class="display-5">Jogo: pedra, papel, tesoura</h5>
+                <p class="fs-5">Selecione a sua opção e clique em jogar:</p>
+                <select id="opcoes" class="form-select" style="width: 25vw;">
+                    <option value="Pedra" selected>Pedra</option>
+                    <option value="Papel">Papel</option>
+                    <option value="Tesoura">Tesoura</option>
+                </select>
+                <button onclick="abrirModalAleatorio()" class="btn btn-primary mt-3" style="width: 15vw;">Jogar</button>
+                <p id="opcaoSelecionada" class="fs-5">Opção Selecionada: -----</p>
+                <p id="opcaoSelecionadaCPU" class="fs-5">Máquina escolheu: -----</p>
+            </div>
+        </div>
+        
+        <div class="row bg-light text-dark mx-3 p-1" style="height: 45vh;">
+            <div class="col d-flex flex-column text-center justify-content-center align-items-center m-2">
+                <p class="fs-5">JOGADOR</p>
+                <img src="jogador.jpg" class="img-fluid border border-4 rounded-pill" alt="Avatar do jogador" style="height: 35vh; width: 40vw;">
+            </div>
+            <div class="col d-flex flex-column text-center justify-content-center align-items-center m-2">
+                <img src="vazia.png" class="img-fluid" id="jogada-jogador" alt="Imagem da jogada" style="height: 20vh; width: 15vw;">
+                <p class="fs-5" id="jogador-vencedor"></p>
+            </div>
+            <div class="col d-flex flex-column text-center justify-content-center align-items-center m-2">
+                <p class="fs-1">VS</p>
+            </div>
+            <div class="col d-flex flex-column text-center justify-content-center align-items-center m-2">
+                <img src="vazia.png" class="img-fluid" id="jogada-cpu" alt="Imagem da jogada" style="height: 20vh; width: 15vw;">
+                <p class="fs-5" id="cpu-vencedor"></p>
+            </div>
+            <div class="col d-flex flex-column text-center justify-content-center align-items-center m-2">
+                <p class="fs-5">MÁQUINA</p>
+                <img src="cpu.jpg" class="img-fluid border border-4 rounded-pill" alt="Avatar da máquina" style="height: 35vh; width: 40vw;">
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-dark text-light text-center d-flex justify-content-around align-items-center mx-3 p-2" style="height: 8vh;">
+        <span class="fs-6">© 2024 Desenvolvido por Carlos Júnior Manutenção. Desafio módulo JavaScript, turma 209 DFS da Infinity School.</span>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <!-- Adicione um elemento (por exemplo, uma div) para exibir as imagens -->
+                    <p class="fs-5 text-center d-flex justify-content-center align-items-center">JOGO EM ANDAMENTO...</p>
+                    <div id="imagemAleatoria" class="img-fluid text-center d-flex justify-content-center align-items-center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Lista de imagens
+        const imagens = [
+            "pedra.png",
+            "papel.png",
+            "tesoura.png"
+        ];
+
+        // Função para exibir imagens aleatoriamente no modal
+        function abrirModalAleatorio() {
+            // Limpar os valores dos campos
+            document.getElementById('opcaoSelecionada').innerHTML = 'Opção Selecionada: -----'
+            document.getElementById('opcaoSelecionadaCPU').innerHTML = 'Máquina escolheu: -----'
+            document.getElementById('jogador-vencedor').innerHTML = ''
+            document.getElementById('cpu-vencedor').innerHTML = ''
+            document.getElementById('jogada-jogador').src = 'vazia.png'
+            document.getElementById('jogada-cpu').src = 'vazia.png'
+                
+            const modal = new bootstrap.Modal(document.getElementById("imagemModal"));
+            let index = 0;
+
+            // Exibe a primeira imagem
+            exibirImagem();
+
+            // Função para exibir a próxima imagem
+            function exibirImagem() {
+                if (index < imagens.length) {
+                    const imagemAtual = imagens[index];
+                    document.getElementById("imagemAleatoria").innerHTML = `<img src="${imagemAtual}" alt="Imagem Aleatória" class="img-fluid">`;
+                    index++;
+
+                    // Aguarde meio segundo antes de exibir a próxima imagem
+                    setTimeout(exibirImagem, 1000);
+                } else {
+                    // Todas as imagens foram exibidas, feche o modal
+                    modal.hide();
+                }
+            }
+
+            // Abra o modal
+            modal.show();
+            setTimeout(jogar, 3000);
+        }
+               
+        function jogar() {
+            let opcaoSelecionada = document.getElementById('opcoes')
+            let opcao_jogador = opcaoSelecionada.value
+            let opcoes = ["Pedra", "Papel", "Tesoura"]
+            let opcao_cpu = opcoes[Math.floor(Math.random() * opcoes.length)]
+
+            if (opcao_jogador == 'Pedra'){
+                document.getElementById('jogada-jogador').src = 'pedra.png'
+            }
+            if (opcao_cpu == 'Pedra'){
+                document.getElementById('jogada-cpu').src = 'pedra.png'
+            }
+            if (opcao_jogador == 'Papel'){
+                document.getElementById('jogada-jogador').src = 'papel.png'
+            }
+            if (opcao_cpu == 'Papel'){
+                document.getElementById('jogada-cpu').src = 'papel.png'
+            }
+            if (opcao_jogador == 'Tesoura'){
+                document.getElementById('jogada-jogador').src = 'tesoura.png'
+            }
+            if (opcao_cpu == 'Tesoura'){
+                document.getElementById('jogada-cpu').src = 'tesoura.png'
+            }
+            let vencedor = ''
+            
+            document.getElementById('opcaoSelecionada').innerHTML = 'Opção Selecionada: ' + opcao_jogador
+            document.getElementById('opcaoSelecionadaCPU').innerHTML = 'Máquina escolheu: ' + opcao_cpu
+
+            // Casos de vitória do jogador:
+            if (opcao_jogador == 'Pedra' && opcao_cpu == 'Tesoura'){
+                vencedor = 'jogador'
+            }
+
+            if (opcao_jogador == 'Papel' && opcao_cpu == 'Pedra'){
+                vencedor = 'jogador'
+            }
+
+            if (opcao_jogador == 'Tesora' && opcao_cpu == 'Papel'){
+                vencedor = 'jogador'
+            }
+            // Final - Casos de vitória do jogador:
+
+            // Casos de vitória da máquina:
+            if (opcao_cpu == 'Pedra' && opcao_jogador == 'Tesoura'){
+                vencedor = 'cpu'
+            }
+
+            if (opcao_cpu == 'Papel' && opcao_jogador == 'Pedra'){
+                vencedor = 'cpu'
+            }
+
+            if (opcao_cpu == 'Tesora' && opcao_jogador == 'Papel'){
+                vencedor = 'cpu'
+            }
+            // Final - Casos de vitória da máquina:
+
+            // Casos de empate:
+            if ((opcao_jogador == 'Pedra' && opcao_cpu == 'Pedra') || (opcao_jogador == 'Papel' && opcao_cpu == 'Papel') || (opcao_jogador == 'Tesoura' && opcao_cpu == 'Tesoura')) {
+                vencedor = 'empate'
+            }
+            // Final - Casos de empate:
+
+            if (vencedor == 'jogador'){
+                document.getElementById('jogador-vencedor').innerHTML = 'Parabéns! Você venceu.'
+            }
+
+            if (vencedor == 'cpu'){
+                document.getElementById('cpu-vencedor').innerHTML = 'A máquina venceu!'
+            }
+
+            if (vencedor == 'empate'){
+                document.getElementById('jogador-vencedor').innerHTML = 'Empatou!'
+                document.getElementById('cpu-vencedor').innerHTML = 'Empatou!'
+            }
+        }
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="jquery.mask.min.js"></script>
+</body>
+</html>
